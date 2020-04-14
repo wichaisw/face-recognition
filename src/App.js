@@ -40,7 +40,6 @@ function App() {
   const [imgUrl, setImgUrl] = useState("");
 
   useEffect(() => {
-    setImgUrl(imgUrl)
     console.log(`useEffect ${imgUrl}`)
     fetchData()
   }, [imgUrl])
@@ -101,7 +100,7 @@ function App() {
       <ImageLinkForm onInputChange={onInputChange} onButtonSubmit={onButtonSubmit} />
       <FaceRecognition imgUrl={imgUrl} />
 
-
+      {console.log("return App")}
       Icons made by
       <footer>
         <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from
