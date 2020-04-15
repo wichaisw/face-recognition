@@ -38,11 +38,32 @@ function App() {
   
   const [input, setInput] = useState("");
   const [imgUrl, setImgUrl] = useState("");
+  const [box, setBox] = useState({});
 
   useEffect(() => {
     console.log(`useEffect ${imgUrl}`)
     fetchData()
   }, [imgUrl])
+
+  const calculateFaceLocation = (data) => {
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    console.log(clarifaiFace);
+    const image = document.getElementById("inputImage")
+    const width = Number(image.width)
+    const height = Number(image.height)
+
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - (clarifaiFace.right_col * width),
+      bottomRow: height - (clarifaiFace.bottom_row * height),
+    }
+  }
+
+  const displayFaceBox = (boxPosition) => {
+    console.log(`boxPosition ${boxPosition}`);
+    setBox(boxPosition)
+  }
 
   const onInputChange = (event) => {
     setInput(event.target.value);
@@ -51,17 +72,11 @@ function App() {
 
   const fetchData = () => {
     app.models.predict(
+      //Clarifai.FACE_DETECT_MODEL
       "a403429f2ddf4b49b307e318f00e528b",
       imgUrl)
-      .then(
-        function(response) {
-          // do something with response
-          console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
-        },
-        function(err) {
-          // there was an error
-          console.log(err);
-        }
+      .then(response => displayFaceBox(calculateFaceLocation(response)))
+      .catch(err => console.log(err)
     );
   }
 
@@ -98,14 +113,7 @@ function App() {
       <Logo />
       <Rank />
       <ImageLinkForm onInputChange={onInputChange} onButtonSubmit={onButtonSubmit} />
-      <FaceRecognition imgUrl={imgUrl} />
-
-      {console.log("return App")}
-      Icons made by
-      <footer>
-        <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from
-        <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-      </footer>
+      <FaceRecognition imgUrl={imgUrl} box={box} />
     </div>
   );
 }
