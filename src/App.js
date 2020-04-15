@@ -23,15 +23,15 @@ const particlesOptions = {
     }
   },
   // doesn't work because of z-index
-  // interactivity: {
-  //   detect_on: "canvas",
-  //   events: {
-  //     onclick: {
-  //       enable: true,
-  //       mode: "push"
-  //     }
-  //   }
-  // }
+  interactivity: {
+    detect_on: "canvas",
+    events: {
+      onclick: {
+        enable: true,
+        mode: "push"
+      }
+    }
+  }
 }
 
 function App() {
@@ -84,24 +84,6 @@ function App() {
     setImgUrl(input)
     console.log("onButtonSubmit");
   }
-
-  // const onButtonSubmit = () => {
-  //   setImgUrl(input)
-  //   console.log("click");
-  //   app.models.predict(
-  //     "a403429f2ddf4b49b307e318f00e528b",
-  //     imgUrl)
-  //     .then(
-  //       function(response) {
-  //         // do something with response
-  //         console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
-  //       },
-  //       function(err) {
-  //         // there was an error
-  //         console.log(err);
-  //       }
-  //   );
-  // }
 
   return (
     <div className="App">

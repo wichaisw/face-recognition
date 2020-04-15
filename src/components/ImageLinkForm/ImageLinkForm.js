@@ -3,7 +3,7 @@ import './ImageLinkForm.css';
 
 const ImageLinkForm = (props) => {
   return(
-    <div>
+    <div className="z-index--2">
       <p className="f3">
         {"The Minerva's owl can detect faces in pictures."}
       </p>
