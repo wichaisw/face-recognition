@@ -11,6 +11,11 @@ function Logo() {
             <img src={owl} alt="owl-logo"/>
         </div>
       </Tilt>
+      <div className="absolute">
+        Icons made by
+        <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a><br />from
+        <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+      </div>
     </div>
   )
 }
