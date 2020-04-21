@@ -131,7 +131,7 @@ function App() {
       { route === "home"
         ? <>
         <Logo />
-        <Rank />
+        <Rank name={user.name} entries={user.entries} />
         <ImageLinkForm onInputChange={onInputChange} onButtonSubmit={onButtonSubmit} />
         <FaceRecognition imgUrl={imgUrl} box={box} />        
         </>
