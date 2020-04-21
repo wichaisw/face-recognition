@@ -67,7 +67,23 @@ function App() {
       //Clarifai.FACE_DETECT_MODEL
       "a403429f2ddf4b49b307e318f00e528b",
       imgUrl)
-      .then(response => displayFaceBox(calculateFaceLocation(response)))
+      .then(response => {
+        if(response) {
+          fetch('http://localhost:8000/image', {
+            method: 'put',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              id: user.id
+            })
+          })
+            .then(response => response.json())
+            .then(count => {
+              setUser({...user,
+              entries: count})
+            })
+        }
+        displayFaceBox(calculateFaceLocation(response))
+      })
       .catch(err => console.log('fetch clarifai',err)
     );
   }, [imgUrl])
