@@ -44,6 +44,13 @@ function App() {
   const [box, setBox] = useState({});
   const [route, setRoute] = useState("signIn");
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [user, setUser] = useState({
+    id: '',
+    name: '',
+    email: '',
+    entries: '',
+    joined: ''
+  })
 
 // invoke only once, equals to componentDidMount
 // useEffect(() => {
@@ -64,6 +71,16 @@ function App() {
       .catch(err => console.log('fetch clarifai',err)
     );
   }, [imgUrl])
+
+  const loadUser = (data) => {
+    setUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    })
+  }
 
   const onRouteChange = (route) => {
     if(route === "signOut") {
@@ -119,8 +136,8 @@ function App() {
         <FaceRecognition imgUrl={imgUrl} box={box} />        
         </>
         : (route === "signIn"
-          ? <SignIn onRouteChange={onRouteChange} />
-          : <Register onRouteChange={onRouteChange} />
+          ? <SignIn onRouteChange={onRouteChange} loadUser={loadUser} />
+          : <Register onRouteChange={onRouteChange} loadUser={loadUser} />
         )
       }
     </div>

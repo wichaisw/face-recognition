@@ -25,8 +25,9 @@ const SignIn = (props) => {
       })
     })
       .then(response => response.json())
-      .then(data => {
-        if(data === 'signin success') {
+      .then(user => {
+        if(user.id) {
+          props.loadUser(user)
           props.onRouteChange('home');
         }
       })
