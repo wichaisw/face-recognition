@@ -31,7 +31,7 @@ const db = {
 }
 
 app.get('/', (req, res) => {
-  res.status(200).json('this is working\n' + JSON.stringify(db.users, null , '\t'))
+  res.status(200).json(db.users)
 })
 
 app.post('/signin', (req, res) => {
