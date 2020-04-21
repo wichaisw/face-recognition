@@ -45,9 +45,24 @@ function App() {
   const [route, setRoute] = useState("signIn");
   const [isSignedIn, setIsSignedIn] = useState(false);
 
+// invoke only once, equals to componentDidMount
+// useEffect(() => {
+//   console.log('componentDidMount')
+//   fetch('http://localhost:8000/')
+//     .then(response => response.json())
+//     .then(data => console.log(data))
+// }, [])
+
   useEffect(() => {
     console.log(`useEffect ${imgUrl}`)
-    fetchData()
+    
+    app.models.predict(
+      //Clarifai.FACE_DETECT_MODEL
+      "a403429f2ddf4b49b307e318f00e528b",
+      imgUrl)
+      .then(response => displayFaceBox(calculateFaceLocation(response)))
+      .catch(err => console.log('fetch clarifai',err)
+    );
   }, [imgUrl])
 
   const onRouteChange = (route) => {
@@ -81,15 +96,9 @@ function App() {
     setInput(event.target.value);
   }
 
-  const fetchData = () => {
-    app.models.predict(
-      //Clarifai.FACE_DETECT_MODEL
-      "a403429f2ddf4b49b307e318f00e528b",
-      imgUrl)
-      .then(response => displayFaceBox(calculateFaceLocation(response)))
-      .catch(err => console.log(err)
-    );
-  }
+  // const fetchData = () => {
+
+  // }
 
   const onButtonSubmit = () => {
     setImgUrl(input)
