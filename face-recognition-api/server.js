@@ -81,11 +81,7 @@ app.post('/register', (req,res) => {
     });
   });
 
-  db('users').insert({
-    email: email,
-    name: name,
-    joined: new Date()
-  }).then(console.log);
+  // old db that rely on json data
   // db.users.push(
   //   {
   //     id: '05',
@@ -96,6 +92,22 @@ app.post('/register', (req,res) => {
   //     joined: new Date()
   //   }
   // );
+
+  db('users')
+    .returning('*')
+    .insert({
+      email: email,
+      name: name,
+      joined: new Date()
+    })
+    .then(user => {
+      res.status(201).json(user[0]);  // there should only be one registering user at a time so we use index [0] to select object in the array instead of respond with a whole object
+    })
+    .catch(err => {
+      res.status(400).json('unable to register') // don't response with err becuz we shouldn't give user any information about our server
+    });
+
+  // old json response
   // res.json(db.users[db.users.length-1]);
 });
 
