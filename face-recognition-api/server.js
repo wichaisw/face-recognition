@@ -2,6 +2,21 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+const knex = require('knex');
+
+const db = knex({
+  client: 'pg',
+  connection: {
+    host : '127.0.0.1',
+    user : 'postgres',
+    password : 'test',
+    database : 'face_recognition'
+  }
+});
+
+db.select('*').from('users').then(data => {
+  console.log(data)
+});
 
 const app = express();
 
@@ -9,26 +24,26 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cors());
 
-const db = {
-  users: [
-    {
-      id: '01',
-      name: 'Josh',
-      email: 'josh@gmail.com',
-      password: 'cookies',
-      entries: 0,
-      joined: new Date()
-    },
-    {
-      id: '02',
-      name: 'Sally',
-      email: 'sally@gmail.com',
-      password: 'banana',
-      entries: 0,
-      joined: new Date()
-    }
-  ]
-}
+// const db = {
+//   users: [
+//     {
+//       id: '01',
+//       name: 'Josh',
+//       email: 'josh@gmail.com',
+//       password: 'cookies',
+//       entries: 0,
+//       joined: new Date()
+//     },
+//     {
+//       id: '02',
+//       name: 'Sally',
+//       email: 'sally@gmail.com',
+//       password: 'banana',
+//       entries: 0,
+//       joined: new Date()
+//     }
+//   ]
+// }
 
 app.get('/', (req, res) => {
   res.status(200).json(db.users)
@@ -65,19 +80,23 @@ app.post('/register', (req,res) => {
         console.log(hash)
     });
   });
-  db.users.push(
-    {
-      id: '05',
-      name: name,
-      email: email,
-      password: password,
-      entries: 0,
-      joined: new Date()
-    }
-  );
-  console.log(db.users)
-  console.log(db)
-  res.json(db.users[db.users.length-1]);
+
+  db('users').insert({
+    email: email,
+    name: name,
+    joined: new Date()
+  }).then(console.log);
+  // db.users.push(
+  //   {
+  //     id: '05',
+  //     name: name,
+  //     email: email,
+  //     password: password,
+  //     entries: 0,
+  //     joined: new Date()
+  //   }
+  // );
+  // res.json(db.users[db.users.length-1]);
 });
 
 app.get('/profile/:id', (req, res) => {
