@@ -46,7 +46,7 @@ app.use(cors());
 // }
 
 app.get('/', async (req, res) => {
-  let users = await db.select('*').from('users');
+  const users = await db.select('*').from('users');
   res.status(200).json(users);
 })
 
@@ -71,7 +71,7 @@ app.post('/signin', (req, res) => {
     }
 });
 
-/* send function sets the content type to text/Html which means that the client will now treat it as text. It then returns the response to the client. The res. json function on the other handsets the content-type header to application/JSON so that the client treats the response string as a valid JSON object
+/* send function sets the content type to text/Html which means that the client will now treat it as text. It then returns the response to the client. The res. json function, on the other hand, sets the content-type header to application/JSON so that the client treats the response string as a valid JSON object
 */
 
 app.post('/register', (req,res) => {
@@ -113,20 +113,6 @@ app.post('/register', (req,res) => {
 });
 
 app.get('/profile/:id', async (req, res) => {
-
-  try {
-    let selectedUser = await db.select('*').from('users').where({id: req.params.id});
-    // db('users').where({id: req.params.id}).select('*');
-
-    if(selectedUser.length) {
-      found = true;
-      return res.status(200).json(selectedUser[0]); // params id เลือก user เดียวอยู่แล้ว เลยใส่ [0] เพื่อเลือก array ใน obj
-    } else {
-      return res.status(404).send('Not Found');
-    }
-  } catch(err) {
-    res.status(400).send('error getting user');
-  }
   // rely on old jason data
   /*db.users.forEach(user => {
    *  if(user.id === req.params.id) {
@@ -139,21 +125,48 @@ app.get('/profile/:id', async (req, res) => {
    * }
   */
   
+  try {
+    const selectedUser = await db.select('*').from('users').where({id: req.params.id});
+    // db('users').where({id: req.params.id}).select('*');
+
+    if(selectedUser.length) {
+      found = true;
+      return res.status(200).json(selectedUser[0]); // params id เลือก user เดียวอยู่แล้ว เลยใส่ [0] เพื่อเลือก array ใน obj
+    } else {
+      return res.status(404).send('Not Found');
+    }
+  } catch(err) {
+    res.status(400).send('error getting user');
+  }
 
 });
 
-app.put('/image', (req, res) => {
-  let found = false;
-  db.users.forEach(user => {
-    if(user.id === req.body.id) {
-      found = true;
-      user.entries++;
-      return res.json(user.entries);
+app.put('/image', async (req, res) => {
+  // rely on old json data
+  /*
+   * let found = false;
+   * db.users.forEach(user => {
+   *   if(user.id === req.body.id) {
+   *     found = true;
+   *     user.entries++;
+   *     return res.json(user.entries);
+   *   }
+   * });
+   * if (!found) {
+   *   res.status(404).send('not found');
+   * }
+  */
+    try {
+      const updatedEntries = await db('users')
+        .where( 'id', '=', req.body.id )
+        .increment('entries', 1)
+        .returning('entries')
+
+      res.status(201).json(updatedEntries[0]);
+    } catch(err) {
+      res.status(400).send('unable to update entries');
     }
-  });
-  if (!found) {
-    res.status(404).send('not found');
-  }
+    
 });
 
 
