@@ -14,9 +14,9 @@ const db = knex({
   }
 });
 
-db.select('*').from('users').then(data => {
-  console.log(data)
-});
+// db.select('*').from('users').then(data => {
+//   console.log(data)
+// });
 
 const app = express();
 
@@ -45,8 +45,9 @@ app.use(cors());
 //   ]
 // }
 
-app.get('/', (req, res) => {
-  res.status(200).json(db.users)
+app.get('/', async (req, res) => {
+  let users = await db.select('*').from('users');
+  res.status(200).json(users);
 })
 
 app.post('/signin', (req, res) => {
@@ -111,17 +112,34 @@ app.post('/register', (req,res) => {
   // res.json(db.users[db.users.length-1]);
 });
 
-app.get('/profile/:id', (req, res) => {
-  let found = false;
-  db.users.forEach(user => {
-    if(user.id === req.params.id) {
+app.get('/profile/:id', async (req, res) => {
+
+  try {
+    let selectedUser = await db.select('*').from('users').where({id: req.params.id});
+    // db('users').where({id: req.params.id}).select('*');
+
+    if(selectedUser.length) {
       found = true;
-      return res.status(200).json(user);
-    } 
-  });
-  if (!found) {
-    res.status(404).send('not found');
+      return res.status(200).json(selectedUser[0]); // params id เลือก user เดียวอยู่แล้ว เลยใส่ [0] เพื่อเลือก array ใน obj
+    } else {
+      return res.status(404).send('Not Found');
+    }
+  } catch(err) {
+    res.status(400).send('error getting user');
   }
+  // rely on old jason data
+  /*db.users.forEach(user => {
+   *  if(user.id === req.params.id) {
+   *    found = true;
+   *    return res.status(200).json(user);
+   *  } 
+   * }); 
+   * if (!found) {
+   *    res.status(404).send('not found');
+   * }
+  */
+  
+
 });
 
 app.put('/image', (req, res) => {
