@@ -51,37 +51,43 @@ app.get('/', async (req, res) => {
 })
 
 app.post('/signin', (req, res) => {
-  // Load hash from your password DB.
-  bcrypt.compare("kokonut", '$2a$10$nb138ZDYLlXuWcZkzDz9z.kfHyIa6Qw5LGswbbNYEnhudcLdpJ6HG', function(err, res) {
-    console.log('first guess', res)
-    // res === true
-  });
-  bcrypt.compare("not_bacon", '$2a$10$nb138ZDYLlXuWcZkzDz9z.kfHyIa6Qw5LGswbbNYEnhudcLdpJ6HG', function(err, res) {
-    console.log('second guess', res)
-    // res === false
-  });
+  // ไม่ต้องทำ transaction เพราะแค่ เช็กข้อมูล ไม่ได้แก้ไขฐานข้อมูล
+  db.select('email', 'hash').from('login')
+    .where({email: req.body.email})                                            // เช็กอีเมล์
+    // .where('email', '=', req.body.email)
+    .then(data => {
+      const isValid = bcrypt.compareSync(req.body.password, data[0].hash);    // เช็กพาสเวิร์ด
+      console.log(isValid)
+      if(isValid) {
+        return db.select('*').from('users')
+          .where({email: req.body.email})
+          .then(user => {
+            res.status(200).json(user[0]);
+          })
+          .catch(err => res.status(400).json('unable to get user'));
+      } else {
+        res.status(400).json('wrong credentials');      // กรณีพาสเวิร์ดผิด
+      }
 
+    })
+    .catch(err => res.status(400).json('wrong credentials'));
 
-  if (req.body.email === db.users[0].email && 
-    req.body.password === db.users[0].password) {
-      res.status(200).json(db.users[0]);
-    } else {
-      console.log(db.users)
-      res.status(400).json('email or password is wrong');
-    }
+  // rely on old json data
+  /*
+   *if (req.body.email === db.users[0].email && 
+   *  req.body.password === db.users[0].password) {
+   *    res.status(200).json(db.users[0]);
+   *  } else {
+   *    console.log(db.users)
+   *    res.status(400).json('email or password is wrong');
+   *  }
+  */
 });
 
 /* send function sets the content type to text/Html which means that the client will now treat it as text. It then returns the response to the client. The res. json function, on the other hand, sets the content-type header to application/JSON so that the client treats the response string as a valid JSON object
 */
 
 app.post('/register', (req,res) => {
-  const { email, name, password } = req.body
-  bcrypt.genSalt(10, function(err, salt) {
-    bcrypt.hash(password, salt, function(err, hash) {
-        console.log(hash)
-    });
-  });
-
   // old db that rely on json data
   // db.users.push(
   //   {
@@ -94,19 +100,41 @@ app.post('/register', (req,res) => {
   //   }
   // );
 
-  db('users')
-    .returning('*')
-    .insert({
-      email: email,
-      name: name,
-      joined: new Date()
+  const { email, name, password } = req.body
+  // const hash = bcrypt.genSalt(10, function(err, salt) {
+  //   bcrypt.hash(password, salt, function(err, hash) {
+  //       // Store hash in your password DB.
+  //   });
+  // });
+  const hash = bcrypt.hashSync(password, 12);
+
+  // ใช้ trx แทน db ใน transaction ถ้าอะไรผิดพลาดก็ rollback ทั้งหมด
+  db.transaction(trx => {
+    trx.insert({
+      hash: hash,
+      email, email
     })
-    .then(user => {
-      res.status(201).json(user[0]);  // there should only be one registering user at a time so we use index [0] to select object in the array instead of respond with a whole object
+    .into('login')
+    .returning('email')  // คืน resolve promise ให้ .then(loginEmail)
+    .then(loginEmail => { 
+      return trx('users')
+        .returning('*')
+        .insert({
+          email: loginEmail[0],
+          name: name,
+          joined: new Date()
+        })
+        .then(user => {
+          res.status(201).json(user[0]);  // there should only be one registering user at a time so we use index [0] to select object in the array instead of respond with a whole object
+        }) 
     })
-    .catch(err => {
-      res.status(400).json('unable to register') // don't response with err becuz we shouldn't give user any information about our server
-    });
+    .then(trx.commit)
+    .catch(trx.rollback)
+  })
+
+  .catch(err => {
+    res.status(400).json('unable to register') // don't response with err becuz we shouldn't give user any information about our server
+  });
 
   // old json response
   // res.json(db.users[db.users.length-1]);
