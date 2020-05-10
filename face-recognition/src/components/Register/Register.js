@@ -4,6 +4,7 @@ const Register = ({ onRouteChange, loadUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [registerError, setRegisterError] = useState(null);
 
   const onNameChange = (e) => {
     setName(e.target.value);
@@ -33,9 +34,11 @@ const Register = ({ onRouteChange, loadUser }) => {
     })
       .then(response => response.json())
       .then(user => {
-        if(user) {
+        if(user.id) {
           loadUser(user)
           onRouteChange('home');
+        } else {
+          setRegisterError('This email already existed.')
         }
       })
   }
@@ -75,6 +78,7 @@ const Register = ({ onRouteChange, loadUser }) => {
                 id="password" 
                 onChange={onPasswordChange}
               />
+              <span>{registerError}</span> 
             </div>
           </fieldset>
           <div className="">
