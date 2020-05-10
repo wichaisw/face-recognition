@@ -60,7 +60,7 @@ function App() {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        input: imgUrl
+        input: input
       })
     })
       .then(response => response.json())
