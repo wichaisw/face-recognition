@@ -32,16 +32,12 @@ app.get('/', async (req, res) => {
 /* send function sets the content type to text/Html which means that the client will now treat it as text. It then returns the response to the client. The res. json function, on the other hand, sets the content-type header to application/JSON so that the client treats the response string as a valid JSON object
 */
 
-
 // dependency injection ใส่เป็น argument หลัง req, res ทำให้ไม่ต้อง import ในไฟล์ register.js
 app.post('/signin', (req, res) => signInController.handleSignIn(req, res, db, bcrypt));
-
 app.post('/register', (req, res) => registerController.handleRegister(req, res, db, bcrypt));
-
 app.get('/profile/:id', (req, res) => profileController.getProfile(req, res, db));
-
 app.put('/image', (req, res) => imageController.updateEntries(req, res, db));
-
+app.post('/imageurl', (req, res) => imageController.clarifaiApiCall(req, res))
 
 app.listen(8000, () => {
   console.log('server is running on port 8000');

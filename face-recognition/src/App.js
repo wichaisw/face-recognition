@@ -8,12 +8,6 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
-
-
-const app = new Clarifai.App({
-  apiKey: '2359209e1dd240c5b8a1ad9a9c7c0dad'
-});
 
 const particlesOptions = {
   particles: {
@@ -38,7 +32,6 @@ const particlesOptions = {
 }
 
 function App() {
-  
   const [input, setInput] = useState("");
   const [imgUrl, setImgUrl] = useState("");
   const [box, setBox] = useState({});
@@ -62,11 +55,19 @@ function App() {
 
   useEffect(() => {
     console.log(`useEffect ${imgUrl}`)
-    
-    app.models.predict(
-      //Clarifai.FACE_DETECT_MODEL
-      "a403429f2ddf4b49b307e318f00e528b",
-      imgUrl)
+    // เรียก clarifai จาก backend 
+    fetch('http://localhost:8000/imageurl', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        input: imgUrl
+      })
+    })
+      .then(response => response.json())
+    // app.models.predict(
+    //   //Clarifai.FACE_DETECT_MODEL
+    //   "a403429f2ddf4b49b307e318f00e528b",
+    //   imgUrl)
       .then(response => {
         if(response) {
           fetch('http://localhost:8000/image', {
