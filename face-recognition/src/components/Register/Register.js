@@ -33,16 +33,18 @@ const Register = ({ onRouteChange, loadUser }) => {
       })
     })
       .then(response => response.json())
-      .then(user => {
-        if(user.id) {
-          loadUser(user)
+      .then(
+        data => {
+        if(data.id) {                           // user
+          loadUser(data)
           onRouteChange('home');
-        } else {
-          setRegisterError('This email already existed.')
+        } else {                                // response คือ 400 จาก api
+          setRegisterError(data)
         }
-      })
+        }
+      )
+      
   }
-
 
   return(
     <article className="br3 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center z-index--2">
@@ -78,7 +80,7 @@ const Register = ({ onRouteChange, loadUser }) => {
                 id="password" 
                 onChange={onPasswordChange}
               />
-              <span>{registerError}</span> 
+              <p>{registerError}</p> 
             </div>
           </fieldset>
           <div className="">

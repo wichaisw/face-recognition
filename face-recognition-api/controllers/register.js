@@ -1,9 +1,14 @@
 const handleRegister = async (req, res, db, bcrypt) => {
   const { email, name, password } = req.body
   const hash = bcrypt.hashSync(password, 12);
+  
+  if(!email || !name || !password) {
+    return res.status(400).json('incorrect form submission');
+  }
 
   const existedEmail = await db.select('*').from('users').where({email: req.body.email})
   console.log(existedEmail[0])
+
   if (existedEmail[0]) {
     res.status(400).json('This email is already existed.')
   } else {
