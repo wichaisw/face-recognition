@@ -81,12 +81,28 @@ function App() {
               setUser({...user,
               entries: count})
             })
+            .catch(console.log)
         }
         displayFaceBox(calculateFaceLocation(response))
       })
       .catch(err => console.log('fetch clarifai',err)
     );
   }, [imgUrl])
+
+  const initialState = () => {
+    setInput('');
+    setImgUrl('');
+    setBox({});
+    setRoute('signIn');
+    setIsSignedIn(false);
+    setUser({
+      id: '',
+      name: '',
+      email: '',
+      entries: '',
+      joined: ''
+    });
+  }
 
   const loadUser = (data) => {
     setUser({
@@ -100,7 +116,8 @@ function App() {
 
   const onRouteChange = (route) => {
     if(route === "signOut") {
-      setIsSignedIn(false);
+      initialState();
+      // setIsSignedIn(false); included in initialState
     } else if(route === "home") {
       setIsSignedIn(true);
     }
@@ -109,9 +126,9 @@ function App() {
 
   const calculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById("inputImage")
-    const width = Number(image.width)
-    const height = Number(image.height)
+    const image = document.getElementById("inputImage");
+    const width = Number(image.width);
+    const height = Number(image.height);
 
     return {
       leftCol: clarifaiFace.left_col * width,
@@ -122,7 +139,7 @@ function App() {
   }
 
   const displayFaceBox = (boxPosition) => {
-    setBox(boxPosition)
+    setBox(boxPosition);
   }
 
   const onInputChange = (event) => {
