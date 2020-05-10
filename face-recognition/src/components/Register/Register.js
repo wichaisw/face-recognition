@@ -35,7 +35,7 @@ const Register = ({ onRouteChange, loadUser }) => {
       .then(response => response.json())
       .then(
         data => {
-        if(data.id) {                           // user
+        if(data.id) {         
           loadUser(data)
           onRouteChange('home');
         } else {                                // response คือ 400 จาก api

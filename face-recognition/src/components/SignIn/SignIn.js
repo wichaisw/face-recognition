@@ -26,13 +26,12 @@ const SignIn = (props) => {
       })
     })
       .then(response => response.json())
-      .then(user => {
-        if(user.id) {
-          props.loadUser(user)
+      .then(data => {
+        if(data.id) {                                         // resolve user
+          props.loadUser(data)
           props.onRouteChange('home');
-          setSignInError(null)
         } else {
-          setSignInError('email or password is wrong')
+          setSignInError(data)        // reject error response
         }
       })
   }
@@ -63,8 +62,8 @@ const SignIn = (props) => {
                 id="password" 
                 onChange={onPasswordChange}
               />
+              <p>{signInError}</p>
             </div>
-            <span>{signInError}</span>
           </fieldset>
           <div className="">
             <input onClick={onSubmitSignIn}
