@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 const SignIn = (props) => {
   const [signInEmail, setSignInEmail] = useState('');
   const [signInPassword, setSignInPassword] = useState('');
+  const [signInError, setSignInError] = useState(null);
 
   const onEmailChange = (event) => {
     setSignInEmail(event.target.value);
@@ -29,6 +30,9 @@ const SignIn = (props) => {
         if(user.id) {
           props.loadUser(user)
           props.onRouteChange('home');
+          setSignInError(null)
+        } else {
+          setSignInError('email or password is wrong')
         }
       })
   }
@@ -60,6 +64,7 @@ const SignIn = (props) => {
                 onChange={onPasswordChange}
               />
             </div>
+            <span>{signInError}</span>
           </fieldset>
           <div className="">
             <input onClick={onSubmitSignIn}
